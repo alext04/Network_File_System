@@ -1,0 +1,268 @@
+// Requests 
+
+0x01: Initialize connection (CL -> NM or SS -> NM)
+    Byte 2: 
+        = 0 : client
+        = 1 : storage server
+    If client:
+        byte 3-6 : client_id
+    If storage server:
+        Byte 3-6 : Port for communication with naming server.
+        Byte 7-10 : Port for direct communication with client.
+
+0x02 : List Directories (SS -> NM)
+    4 Bytes: Number of entries (N)
+    N entries :
+        4 Bytes each containing hash value
+
+0x03 : Create File (NM -> SS)
+    4 Bytes : Length of the path (N)
+    N Bytes : path ( including client_id )
+    1 Byte : Null Byte;
+
+0x04 : Create Dir (NM -> SS)
+    4 Bytes : Length of the path (N)
+    N Bytes : path ( including client_id )
+    1 Byte : Null Byte
+
+0x05 : Delete File (NM -> SS)
+    4 Bytes : Length of the path (N)
+    N Bytes : path ( including client_id )
+    1 Byte : Null Byte;
+
+0x06 : Delete Dir (NM -> SS)
+    4 Bytes : Length of the path (N)
+    N Bytes : path ( including client_id )
+    1 Byte : Null Byte;
+
+0x07 : Copy File (NM -> SS)
+    4 Bytes : Length of the src path (N1)
+    N1 Bytes : src path ( including client_id )
+    1 Byte : Null Byte;
+    4 Bytes : IP address of Dest SS
+    4 Bytes : Port of Dest SS
+    4 Bytes : Length of dest path (N2)
+    N2 Bytes : dest path ( including client_id )
+    1 Byte : Null Byte;
+
+0x08 : Copy Dir (NM -> SS)
+    4 Bytes : Length of the src path (N1)
+    N1 Bytes : src path ( including client_id )
+    1 Byte : Null Byte;
+    4 Bytes : IP address of Dest SS
+    4 Bytes : Port of Dest SS
+    4 Bytes : Length of dest path (N2)
+    N2 Bytes : dest path ( including client_id )
+    1 Byte : Null Byte;
+
+0x09 : Get File Loc (CL -> NM)
+    4 Bytes : Length of the src path (N)
+    N Bytes : src path ( excluding client_id )
+    1 Byte : Null Byte;
+
+0x0a : Get Dir Loc (CL -> NM) // Can be ignored ??
+    4 Bytes : Length of the src path (N)
+    N Bytes : src path ( excluding client_id )
+    1 Byte : Null Byte;
+
+0x0b : Read File (CL -> SS)
+    4 Bytes : Length of the src path (N)
+    N Bytes : src path ( including client_id )
+    1 Byte : Null Byte;
+
+0x0c : Write File (CL -> SS)
+    4 Bytes : Length of the src path (N)
+    N Bytes : src path ( including client_id )
+    1 Byte : Null Byte;
+    4 Bytes : Length of the content (N2)
+    N2 Bytes : content of File
+    1 Byte : Null Byte;
+
+0x0d : Get File Info (CL -> SS)
+    4 Bytes : Length of the src path (N)
+    N Bytes : src path ( including client_id )
+    1 Byte : Null Byte;
+
+0x13 : Create File (CL -> NM)
+    4 Bytes : Length of the path (N)
+    N Bytes : path ( excluding client_id )
+    1 Byte : Null Byte;
+
+0x14 : Create Dir (CL -> NM)
+    4 Bytes : Length of the path (N)
+    N Bytes : path ( excluding client_id )
+    1 Byte : Null Byte
+
+0x15 : Delete File (CL -> NM)
+    4 Bytes : Length of the path (N)
+    N Bytes : path ( excluding client_id )
+    1 Byte : Null Byte;
+
+0x16 : Delete Dir (CL -> NM)
+    4 Bytes : Length of the path (N)
+    N Bytes : path ( excluding client_id )
+    1 Byte : Null Byte;
+    // Remove sub-files from hash table ??
+
+0x17 : Copy File (CL -> NM)
+    4 Bytes : Length of the src path (N1)
+    N1 Bytes : src path ( excluding client_id )
+    1 Byte : Null Byte;
+    4 Bytes : Length of dest path (N2)
+    N2 Bytes : dest path ( excluding client_id )
+    1 Byte : Null Byte;
+
+0x18 : Copy Dir (CL -> NM)
+    4 Bytes : Length of the src path (N1)
+    N1 Bytes : src path ( excluding client_id )
+    1 Byte : Null Byte;
+    4 Bytes : Length of dest path (N2)
+    N2 Bytes : dest path ( excluding client_id )
+    1 Byte : Null Byte;
+
+
+0x19 : Paste File (SS -> SS)
+    4 Bytes : Length of the dest path (N1)
+    N1 Bytes : dest path ( including client_id )
+    1 Byte : Null Byte;
+    4 Bytes : Length of tar file
+    N2 Bytes : content
+    1 Byte : Null Byte;
+
+0x1a : Paste Dir (SS -> SS)
+    4 Bytes : Length of the dest path (N1)
+    N1 Bytes : dest path ( including client_id )
+    1 Byte : Null Byte;
+    4 Bytes : tar file size
+    N2 Bytes : tar file content
+    1 Byte : Null Byte;
+
+0x1b : Echo (NM -> SS)
+    Nothing
+
+
+
+// Responses
+
+0x81 : Initialize connection (NM -> CL or NM -> SS)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error // TODO: Enumerate errors
+    
+0x82 : List Dirs (NM -> SS)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    
+0x83 : Create File (SS -> NM)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    
+0x84 : Create Dir (SS -> NM)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    
+0x85 : Delete File (SS -> NM)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    
+0x86 : Delete Dir (SS -> NM)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+
+0x87 : Copy File (SS -> NM)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    
+0x88 : Copy Dir (SS -> NM)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+
+0x89 : Get File Loc (NM -> SS)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    4 Bytes : Client ID 
+    4 Bytes : IP address of Dest SS (example: 127,0,0,1)
+    4 Bytes : Port of Dest SS (2nd port)
+
+0x8a : Get Dir Loc (NM -> SS) // Ignore ??
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    4 Bytes : Client ID 
+    4 Bytes : IP address of Dest SS
+    4 Bytes : Port of Dest SS
+
+0x8b : Read File (SS -> CL)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    4 Bytes : Content length (N)
+    N Bytes : Content
+    1 Byte : NULL Byte
+
+0x8c : Write File (SS -> CL)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    
+0x8d : Get File Info (SS -> CL)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    4 Bytes : File Size
+    // end here 
+    4 Bytes : File Permission // Ignore
+
+0x93 : Create File (NM -> CL)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    
+0x94 : Create Dir (NM -> CL)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    
+0x95 : Delete File (NM -> CL)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    
+0x96 : Delete Dir (NM -> CL)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+
+0x97 : Copy File (NM -> CL)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+    
+0x98 : Copy Dir (NM -> CL)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+
+
+0x99 : Paste File (SS -> SS)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+
+
+0x9a : Paste Dir (SS -> SS)
+    1 Byte : Status :
+        = 0 : OK
+        else : Error 
+
+0x9b : Echo (SS -> NM)
+    Nothing
+
